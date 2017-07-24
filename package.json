@@ -1,0 +1,21 @@
+{
+  "name": "nhdfs",
+  "version": "0.0.0",
+  "description": "",
+  "main": "./lib/hndfs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "./hdfslib-build.sh",
+    "install": "node-gyp rebuild",
+    "clean": "rm -rf build_deps"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bindings": "^1.2.1",
+    "node-addon-api": "^0.3.5"
+  },
+  "devDependencies": {
+    "node-gyp": "^3.6.2"
+  }
+}
