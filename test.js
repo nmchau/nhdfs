@@ -3,7 +3,7 @@ const FileSystem = require('./lib/nhdfs').FileSystem;
 
 const lfs = require('fs');
 
-const h1 = new FileSystem("lga-grid107.contextweb.prod", 9000);
+const h1 = new FileSystem("localhost", 9000);
 h1.ls(".").then((list) => {
     console.log("list 1");
     list.forEach((element) => {
