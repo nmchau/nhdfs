@@ -25,7 +25,10 @@
         "libraries": [
           "-lhdfs3",
           "-L<(module_root_dir)/build_deps/libhdfs3/dist/lib",
-        ]
+        ],
+        'ldflags': [
+          '-Wl,-rpath,<(module_root_dir)/build_deps/libhdfs3/dist/lib',
+        ],
       },
       'cflags!': [ '-fno-exceptions' ],
 	    'cflags_cc!': [ '-fno-exceptions' ],
