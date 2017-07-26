@@ -2,7 +2,7 @@
   "name": "nhdfs",
   "version": "0.0.0",
   "description": "",
-  "main": "./lib/hndfs",
+  "main": "./lib/nhdfs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "preinstall": "./hdfslib-build.sh",
