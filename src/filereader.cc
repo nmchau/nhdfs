@@ -31,7 +31,6 @@ void FileReader::Init(Napi::Env env, Napi::Object exports)
 
 FileReader::FileReader(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileReader>() 
 {
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(2);
     REQUIRE_ARGUMENT_STRING(0, path)
     REQUIRE_ARGUMENT_FS(1, f)
@@ -53,7 +52,6 @@ FileReader::~FileReader()
 
 Napi::Value FileReader::Open(const Napi::CallbackInfo &info)
 {
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(1)
     REQUIRE_ARGUMENT_FUNCTION(0, cb)
     std::function<int()> f = [this] {
@@ -66,8 +64,6 @@ Napi::Value FileReader::Open(const Napi::CallbackInfo &info)
 
 Napi::Value FileReader::Read(const Napi::CallbackInfo &info)
 {
-    std::cout << "read " << std::endl;
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(3);
     REQUIRE_ARGUMENT_BUFFER(0, buffer)
     REQUIRE_ARGUMENT_INT(1, l)
@@ -83,7 +79,6 @@ Napi::Value FileReader::Read(const Napi::CallbackInfo &info)
 
 Napi::Value FileReader::Close(const Napi::CallbackInfo &info)
 {
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(1);
     REQUIRE_ARGUMENT_FUNCTION(0, cb)
     std::function<int()> f = [this] {

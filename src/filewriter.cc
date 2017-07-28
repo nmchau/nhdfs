@@ -31,7 +31,6 @@ void FileWriter::Init(Napi::Env env, Napi::Object exports)
 
 FileWriter::FileWriter(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileWriter>()
 {
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(2);
     REQUIRE_ARGUMENT_STRING(0, path)
     REQUIRE_ARGUMENT_FS(1, f)
@@ -52,7 +51,6 @@ FileWriter::~FileWriter()
 
 Napi::Value FileWriter::Open(const Napi::CallbackInfo &info) 
 {
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(1)
     REQUIRE_ARGUMENT_FUNCTION(0, cb)
     std::function<int()> f = [this] {
@@ -65,7 +63,6 @@ Napi::Value FileWriter::Open(const Napi::CallbackInfo &info)
 
 Napi::Value FileWriter::Write(const Napi::CallbackInfo &info)
 {
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(3)
     REQUIRE_ARGUMENT_BUFFER(0, buffer)
     REQUIRE_ARGUMENT_INT(1, l)
@@ -81,7 +78,6 @@ Napi::Value FileWriter::Write(const Napi::CallbackInfo &info)
 
 Napi::Value FileWriter::Flush(const Napi::CallbackInfo &info)
 {
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(1);
     REQUIRE_ARGUMENT_FUNCTION(0, cb)
     std::function<int()> f = [this] {
@@ -94,7 +90,6 @@ Napi::Value FileWriter::Flush(const Napi::CallbackInfo &info)
 
 Napi::Value FileWriter::HFlush(const Napi::CallbackInfo &info)
 {
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(1);
     REQUIRE_ARGUMENT_FUNCTION(0, cb)
     std::function<int()> f = [this] {
@@ -107,7 +102,6 @@ Napi::Value FileWriter::HFlush(const Napi::CallbackInfo &info)
 
 Napi::Value FileWriter::Sync(const Napi::CallbackInfo &info)
 {
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(1);
     REQUIRE_ARGUMENT_FUNCTION(0, cb)
     std::function<int()> f = [this] {
@@ -120,7 +114,6 @@ Napi::Value FileWriter::Sync(const Napi::CallbackInfo &info)
 
 Napi::Value FileWriter::Close(const Napi::CallbackInfo &info)
 {
-    Napi::Env env = info.Env();
     REQUIRE_ARGUMENTS(1);
     REQUIRE_ARGUMENT_FUNCTION(0, cb)
     std::function<int()> f = [this] {
