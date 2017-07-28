@@ -1,6 +1,6 @@
 
-#ifndef NH__MACROS_H
-#define NH__MACROS_H
+#ifndef NHDFS_MACROS_H_
+#define NHDFS_MACROS_H_
 
 #include <napi.h>
 
@@ -35,6 +35,11 @@
     }                                                                          \
     int var = info[i].As<Napi::Number>().Int32Value();     
 
+#define REQUIRE_ARGUMENT_BUFFER(i, var)                                        \
+    if (info.Length() <= (i) || !info[i].IsBuffer()) {                        \
+        Napi::TypeError::New(env, "Argument " #i " must be a byte buffer").ThrowAsJavaScriptException();        \
+    }                                                                          \
+    Napi::Buffer<char> var = info[i].As<Napi::Buffer<char>>();  
 
 #define OPTIONAL_ARGUMENT_FUNCTION(i, var)                                     \
     Napi::Function var;                                                       \
@@ -46,5 +51,13 @@
     }    
 
 #define NAPISTRING(env, s) Napi::String::New(env, s)
+#define NAPIINT(env, i) Napi::Number::New(env, i)
+
+#define REQUIRE_ARGUMENT_FS(i, var)                     \
+    if ( info.Length() <= i && ! FileSystem::HasInstance(info[i]))                              \
+    {                                                   \
+        Napi::TypeError::New(env, "FileSystem object expected").ThrowAsJavaScriptException();   \
+    }                                                   \
+    FileSystem * var = Napi::ObjectWrap<FileSystem>::Unwrap(info[i].As<Napi::Object>());
     
-#endif // NH__MACROS_H
+#endif // NHDFS_MACROS_H_

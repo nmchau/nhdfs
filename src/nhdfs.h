@@ -1,9 +1,10 @@
-#ifndef NH_NHDFS_H
-#define NH_NHDFS_H
+#ifndef NHDFS_NHDFS_H_
+#define NHDFS_NHDFS_H_
 
 #include <napi.h>
 #include "filesystem.h"
 #include "filereader.h"
+#include "filewriter.h"
 
 // #define NAPI_METHOD(name) \
 //   napi_value name(napi_env env, napi_callback_info info)
@@ -14,4 +15,4 @@
 
 // #define CHECK_NAPI_RESULT(condition) (assert((condition) == napi_ok))
 
-#endif //NH_NHDFS_H
+#endif //NHDFS_NHDFS_H_

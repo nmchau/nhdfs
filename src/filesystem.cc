@@ -9,33 +9,10 @@
 
 #include "filesystem.h"
 #include "macros.h"
+#include "workers.h"
 
 namespace nhdfs
 {
-
-class PathWorker : public Napi::AsyncWorker
-{
-  public:
-    PathWorker(std::function<int()> f, Napi::Function cb) : AsyncWorker(cb), func(f), msg("") {}
-    void Execute() override
-    {
-        this->res = func();
-        if (res < 0)
-        {
-            this->msg = hdfsGetLastError();
-        }
-    }
-    void OnOK() override
-    {
-        auto err = (res < 0) ? Napi::String::New(this->Env(), msg) : this->Env().Null();
-        this->Callback().MakeCallback(this->Receiver().Value(), std::initializer_list<napi_value>{err});
-    }
-
-  private:
-    std::function<int()> func;
-    int res = 0;
-    std::string msg;
-};
 
 hdfsFS connect(std::string node, tPort port, Napi::Env env)
 {
@@ -65,8 +42,7 @@ void FileSystem::Init(Napi::Env env, Napi::Object exports)
                 InstanceMethod("CreateDirectory", &FileSystem::CreateDirectory),
                 InstanceMethod("Delete", &FileSystem::Delete),
                 InstanceMethod("List", &FileSystem::List),
-                InstanceMethod("GetPathInfo", &FileSystem::GetPathInfo),
-                InstanceMethod("getProperty", &FileSystem::GetProperty)
+                InstanceMethod("GetPathInfo", &FileSystem::GetPathInfo)
             });
     constructor = Napi::Persistent(t);
     constructor.SuppressDestruct();
@@ -90,14 +66,6 @@ FileSystem::~FileSystem()
     hdfsDisconnect(this->fs);
 }
 
-Napi::Value FileSystem::GetProperty(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    REQUIRE_ARGUMENTS(1);
-    std::string pn = info[0].As<Napi::String>();
-    std::string value = "";
-    return Napi::String::New(env, value);
-}
 
 class ExistsWorker : public Napi::AsyncWorker
 {
@@ -122,12 +90,18 @@ class ExistsWorker : public Napi::AsyncWorker
 Napi::Value FileSystem::Exists(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env(); // for macro
-    REQUIRE_ARGUMENTS(2);
-    std::string path = info[0].As<Napi::String>();
-    Napi::Function cb = info[1].As<Napi::Function>();
-    ExistsWorker *worker = new ExistsWorker(path, this->fs, cb);
-    worker->Queue();
+    REQUIRE_ARGUMENTS(2)
+    REQUIRE_ARGUMENT_STRING(0, path)
+    REQUIRE_ARGUMENT_FUNCTION(1, cb)
+    std::function<int()> f = [this, path] {
+        return hdfsExists(fs, path.c_str());
+    };
+    SimpleResWorker::Start(f, cb);
     return info.Env().Null();
+
+   // ExistsWorker *worker = new ExistsWorker(path, this->fs, cb);
+   // worker->Queue();
+  //  return info.Env().Null();
 }
 
 Napi::Value FileSystem::Rename(const Napi::CallbackInfo &info)
@@ -146,62 +120,54 @@ Napi::Value FileSystem::SetWorkingDirectory(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env(); // for macro
     REQUIRE_ARGUMENTS(2);
-    std::string path = info[0].As<Napi::String>();
-    Napi::Function cb = info[1].As<Napi::Function>();
-
+    REQUIRE_ARGUMENT_STRING(0, path)
+    REQUIRE_ARGUMENT_FUNCTION(1, cb)
     std::function<int()> f = [this, &path] {
         return hdfsSetWorkingDirectory(fs, path.c_str());
     };
-    PathWorker *worker = new PathWorker(f, cb);
-    worker->Queue();
+    SimpleResWorker::Start(f, cb);
     return info.Env().Null();
 }
 
 Napi::Value FileSystem::CreateDirectory(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env(); // for macro
-    //FileSystem *fs = this;
     REQUIRE_ARGUMENTS(2);
-    std::string path = info[0].As<Napi::String>();
-    Napi::Function cb = info[1].As<Napi::Function>();
+    REQUIRE_ARGUMENT_STRING(0, path)
+    REQUIRE_ARGUMENT_FUNCTION(1, cb)
 
     std::function<int()> f = [this, &path] {
         return hdfsCreateDirectory(fs, path.c_str());
     };
-    PathWorker *worker = new PathWorker(f, cb);
-    //worker->Receiver().Set("data", data);
-    //worker->_succeed = succeed;
-    worker->Queue();
+    SimpleResWorker::Start(f, cb);
     return info.Env().Null();
 }
 
 Napi::Value FileSystem::Delete(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env(); // for macro
-    REQUIRE_ARGUMENTS(3);
-    std::string path = info[0].As<Napi::String>();
-    int recursive = info[1].As<Napi::Boolean>();
-    Napi::Function cb = info[2].As<Napi::Function>();
+    REQUIRE_ARGUMENTS(3)
+    REQUIRE_ARGUMENT_STRING(0, path)
+    REQUIRE_ARGUMENT_INT(1, recursive) 
+    REQUIRE_ARGUMENT_FUNCTION(2, cb)
     std::function<int()> f = [this, &path, recursive] {
         return hdfsDelete(fs, path.c_str(), recursive);
     };
-    PathWorker *worker = new PathWorker(f, cb);
-    worker->Queue();
+    SimpleResWorker::Start(f, cb);
     return info.Env().Null();
 }
 
 Napi::Value FileSystem::SetReplication(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env(); // for macro
-    REQUIRE_ARGUMENTS(3);
-    std::string path = info[0].As<Napi::String>();
-    uint32_t repNum = info[1].As<Napi::Number>();
-    Napi::Function cb = info[2].As<Napi::Function>();
+    REQUIRE_ARGUMENTS(3)
+    REQUIRE_ARGUMENT_STRING(0, path)
+    REQUIRE_ARGUMENT_INT(1, repNum) 
+    REQUIRE_ARGUMENT_FUNCTION(2, cb)
     std::function<int()> f = [this, &path, repNum] {
         return hdfsSetReplication(fs, path.c_str(), repNum);
     };
-    PathWorker *worker = new PathWorker(f, cb);
-    worker->Queue();
+    SimpleResWorker::Start(f, cb);
     return info.Env().Null();
 }
 

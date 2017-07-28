@@ -1,5 +1,5 @@
-#ifndef NH_FILEREADER_H
-#define NH_FILEREADER_H
+#ifndef NHDFS_FILEREADER_H_
+#define NHDFS_FILEREADER_H_
 
 #include <string>
 #include <napi.h>
@@ -20,6 +20,8 @@ class FileReader : public Napi::ObjectWrap<FileReader>
     FileReader(const Napi::CallbackInfo &info);
     ~FileReader();
 
+    Napi::Value Open(const Napi::CallbackInfo &info);
+
     Napi::Value Read(const Napi::CallbackInfo &info);
 
     Napi::Value Close(const Napi::CallbackInfo &info);
@@ -35,4 +37,4 @@ class FileReader : public Napi::ObjectWrap<FileReader>
 
 }
 
-#endif //NH_FILEREADER_H
+#endif //NHDFS_FILEREADER_H_

@@ -1,5 +1,5 @@
-#ifndef NH_FILESYSTEM_H
-#define NH_FILESYSTEM_H
+#ifndef NHDFS_FILESYSTEM_H_
+#define NHDFS_FILESYSTEM_H_
 
 #include <map>
 #include <vector>
@@ -33,8 +33,6 @@ public:
     return obj.InstanceOf(constructor.Value());
   }
 
-  Napi::Value GetProperty(const Napi::CallbackInfo &info);
-
   Napi::Value Exists(const Napi::CallbackInfo &info);
 
   Napi::Value Rename(const Napi::CallbackInfo &info);
@@ -55,7 +53,8 @@ public:
   std::string NameNode() { return this->nameNode; }
   tPort Port() { return this->port; }
 
-  friend class FileReader;;
+  friend class FileReader;
+  friend class FileWriter;
 
 private:
   std::string nameNode;
@@ -65,4 +64,4 @@ private:
 
 } //nhdfs
 
-#endif //NH_FILESYSTEM_H
+#endif //NHDFS_FILESYSTEM_H_

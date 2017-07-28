@@ -5,6 +5,7 @@
       "sources": [ 
         "src/nhdfs.cc", 
         "src/filereader.cc", 
+        "src/filewriter.cc", 
         "src/filesystem.cc" 
       ],
       "dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
