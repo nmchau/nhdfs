@@ -39,3 +39,4 @@ fs.list(".").then((list) => {
     console.log(err);
 })
 ```
+See [examples](https://github.com/timout/nhdfs/tree/master/examples) for more usage.

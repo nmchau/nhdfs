@@ -56,7 +56,7 @@
 #define REQUIRE_ARGUMENT_FS(i, var)                     \
     if ( info.Length() <= i && ! FileSystem::HasInstance(info[i]))                              \
     {                                                   \
-        Napi::TypeError::New(info.Env() "FileSystem object expected").ThrowAsJavaScriptException();   \
+        Napi::TypeError::New(info.Env(), "FileSystem object expected").ThrowAsJavaScriptException();   \
     }                                                   \
     FileSystem * var = Napi::ObjectWrap<FileSystem>::Unwrap(info[i].As<Napi::Object>());
     

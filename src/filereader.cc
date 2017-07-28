@@ -31,7 +31,7 @@ void FileReader::Init(Napi::Env env, Napi::Object exports)
 
 FileReader::FileReader(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileReader>() 
 {
-    REQUIRE_ARGUMENTS(2);
+    REQUIRE_ARGUMENTS(2)
     REQUIRE_ARGUMENT_STRING(0, path)
     REQUIRE_ARGUMENT_FS(1, f)
     this->path = path;
