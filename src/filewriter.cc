@@ -106,7 +106,6 @@ Napi::Value FileWriter::Sync(const Napi::CallbackInfo &info)
     REQUIRE_ARGUMENT_FUNCTION(0, cb)
     std::function<int()> f = [this] {
         return hdfsSync(fs, file);
-        ;
     };
     SimpleResWorker::Start(f, cb);
     return info.Env().Null();

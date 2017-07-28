@@ -11,6 +11,8 @@
 #include "macros.h"
 #include "workers.h"
 
+#include <string.h>
+
 namespace nhdfs
 {
 
@@ -100,7 +102,9 @@ Napi::Value FileSystem::GetWorkingDirectory(const Napi::CallbackInfo &info)
     char *b = buffer.Data();
     std::function<int()> f = [this, b, l] {
         char * res = hdfsGetWorkingDirectory(fs, b, l);
-        return ( ! res ) ? -1 : 0;
+        if ( ! res ) return -1;
+        int s = strnlen(res, l);
+        return s;
     };
     SimpleResWorker::Start(f, cb);
     return info.Env().Null();
@@ -111,8 +115,9 @@ Napi::Value FileSystem::SetWorkingDirectory(const Napi::CallbackInfo &info)
     REQUIRE_ARGUMENTS(2)
     REQUIRE_ARGUMENT_STRING(0, path)
     REQUIRE_ARGUMENT_FUNCTION(1, cb)
-    std::function<int()> f = [this, &path] {
-        return hdfsSetWorkingDirectory(fs, path.c_str());
+    std::function<int()> f = [this, path] {
+        int r = hdfsSetWorkingDirectory(fs, path.c_str());
+        return r;
     };
     SimpleResWorker::Start(f, cb);
     return info.Env().Null();
@@ -124,7 +129,7 @@ Napi::Value FileSystem::CreateDirectory(const Napi::CallbackInfo &info)
     REQUIRE_ARGUMENT_STRING(0, path)
     REQUIRE_ARGUMENT_FUNCTION(1, cb)
 
-    std::function<int()> f = [this, &path] {
+    std::function<int()> f = [this, path] {
         return hdfsCreateDirectory(fs, path.c_str());
     };
     SimpleResWorker::Start(f, cb);
@@ -137,7 +142,7 @@ Napi::Value FileSystem::Delete(const Napi::CallbackInfo &info)
     REQUIRE_ARGUMENT_STRING(0, path)
     REQUIRE_ARGUMENT_INT(1, recursive)
     REQUIRE_ARGUMENT_FUNCTION(2, cb)
-    std::function<int()> f = [this, &path, recursive] {
+    std::function<int()> f = [this, path, recursive] {
         return hdfsDelete(fs, path.c_str(), recursive);
     };
     SimpleResWorker::Start(f, cb);
@@ -150,7 +155,7 @@ Napi::Value FileSystem::SetReplication(const Napi::CallbackInfo &info)
     REQUIRE_ARGUMENT_STRING(0, path)
     REQUIRE_ARGUMENT_INT(1, repNum)
     REQUIRE_ARGUMENT_FUNCTION(2, cb)
-    std::function<int()> f = [this, &path, repNum] {
+    std::function<int()> f = [this, path, repNum] {
         return hdfsSetReplication(fs, path.c_str(), repNum);
     };
     SimpleResWorker::Start(f, cb);
