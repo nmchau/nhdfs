@@ -36,6 +36,7 @@ public:
   Napi::Value Exists(const Napi::CallbackInfo &info);
 
   Napi::Value Rename(const Napi::CallbackInfo &info);
+  // Napi::Value Copy(const Napi::CallbackInfo &info);
   Napi::Value GetWorkingDirectory(const Napi::CallbackInfo &info);
   Napi::Value SetWorkingDirectory(const Napi::CallbackInfo &info);
 

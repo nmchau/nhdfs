@@ -41,10 +41,12 @@ void FileSystem::Init(Napi::Env env, Napi::Object exports)
             "FileSystem",
             {InstanceMethod("Exists", &FileSystem::Exists),
              InstanceMethod("Rename", &FileSystem::Rename),
+            //  InstanceMethod("Copy", &FileSystem::Copy),
              InstanceMethod("GetWorkingDirectory", &FileSystem::GetWorkingDirectory),
              InstanceMethod("SetWorkingDirectory", &FileSystem::SetWorkingDirectory),
              InstanceMethod("CreateDirectory", &FileSystem::CreateDirectory),
              InstanceMethod("Delete", &FileSystem::Delete),
+             InstanceMethod("SetReplication", &FileSystem::SetReplication),
              InstanceMethod("List", &FileSystem::List),
              InstanceMethod("GetPathInfo", &FileSystem::GetPathInfo)});
     constructor = Napi::Persistent(t);
@@ -91,6 +93,19 @@ Napi::Value FileSystem::Rename(const Napi::CallbackInfo &info)
     SimpleResWorker::Start(f, cb);
     return info.Env().Null();
 }
+
+// Napi::Value FileSystem::Copy(const Napi::CallbackInfo &info)
+// {
+//     REQUIRE_ARGUMENTS(3)
+//     REQUIRE_ARGUMENT_STRING(0, oldPath)
+//     REQUIRE_ARGUMENT_STRING(1, newPath)
+//     REQUIRE_ARGUMENT_FUNCTION(2, cb)
+//     std::function<int()> f = [this, oldPath, newPath] {
+//         return hdfsCopy(fs, oldPath.c_str(), fs, newPath.c_str());
+//     };
+//     SimpleResWorker::Start(f, cb);
+//     return info.Env().Null();
+// }
 
 Napi::Value FileSystem::GetWorkingDirectory(const Napi::CallbackInfo &info)
 {

@@ -91,7 +91,9 @@ Napi::Value FileReader::Close(const Napi::CallbackInfo &info)
 int FileReader::close()
 {
     if ( this->file ) {
-        return hdfsCloseFile(this->fs, this->file);
+        int res = hdfsCloseFile(this->fs, this->file);
+        this->file = nullptr;
+        return res;
     }
     return 0;
 }
