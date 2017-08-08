@@ -18,9 +18,13 @@ namespace nhdfs
 
 hdfsFS connect(std::string node, tPort port, Napi::Env env)
 {
+    //std::cout << "trying to connect " << node << ":" << port << std::endl;
     struct hdfsBuilder *builder = hdfsNewBuilder();
     hdfsBuilderSetNameNode(builder, node.c_str());
-    hdfsBuilderSetNameNodePort(builder, port);
+    if (port > 0)
+    {
+        hdfsBuilderSetNameNodePort(builder, port);
+    }
     hdfsFS fs = hdfsBuilderConnect(builder);
     hdfsFreeBuilder(builder);
     if (!fs)
@@ -41,7 +45,7 @@ void FileSystem::Init(Napi::Env env, Napi::Object exports)
             "FileSystem",
             {InstanceMethod("Exists", &FileSystem::Exists),
              InstanceMethod("Rename", &FileSystem::Rename),
-            //  InstanceMethod("Copy", &FileSystem::Copy),
+             //  InstanceMethod("Copy", &FileSystem::Copy),
              InstanceMethod("GetWorkingDirectory", &FileSystem::GetWorkingDirectory),
              InstanceMethod("SetWorkingDirectory", &FileSystem::SetWorkingDirectory),
              InstanceMethod("CreateDirectory", &FileSystem::CreateDirectory),
@@ -56,12 +60,25 @@ void FileSystem::Init(Napi::Env env, Napi::Object exports)
 
 FileSystem::FileSystem(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileSystem>()
 {
-    REQUIRE_ARGUMENTS(2);
-    REQUIRE_ARGUMENT_STRING(0, nn);
-    REQUIRE_ARGUMENT_UINT(1, p);
-    this->nameNode = nn;
-    this->port = p;
-    this->fs = connect(nn, p, info.Env());
+    if (info.Length() == 0)
+    {
+        this->nameNode = DEFAULT;
+        this->port = 0;
+    }
+    else if (info.Length() == 1)
+    {
+        REQUIRE_ARGUMENT_STRING(0, nn);
+        this->nameNode = nn;
+        this->port = 0;
+    }
+    else
+    {
+        REQUIRE_ARGUMENT_STRING(0, nn);
+        REQUIRE_ARGUMENT_UINT(1, p);
+        this->nameNode = nn;
+        this->port = p;
+    }
+    this->fs = connect(this->nameNode, this->port, info.Env());
 }
 
 FileSystem::~FileSystem()
@@ -109,7 +126,6 @@ Napi::Value FileSystem::Rename(const Napi::CallbackInfo &info)
 
 Napi::Value FileSystem::GetWorkingDirectory(const Napi::CallbackInfo &info)
 {
-
     REQUIRE_ARGUMENTS(3);
     REQUIRE_ARGUMENT_BUFFER(0, buffer)
     REQUIRE_ARGUMENT_INT(1, l)

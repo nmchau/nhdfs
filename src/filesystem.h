@@ -15,11 +15,14 @@
 namespace nhdfs
 {
 
+#define DEFAULT "default";
+
 class FileSystem;
 
 class FileSystem : public Napi::ObjectWrap<FileSystem>
 {
 public:
+
   static Napi::FunctionReference constructor;
   static void Init(Napi::Env env, Napi::Object exports);
 
