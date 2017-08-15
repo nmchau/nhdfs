@@ -1,6 +1,6 @@
 {
   "name": "nhdfs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ode.js Native HDFS library wrapper",
   "homepage": "https://github.com/timout/nhdfs",
   "repository": {
