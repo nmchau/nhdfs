@@ -28,7 +28,13 @@
         Napi::TypeError::New(info.Env(), "Argument " #i " must be a integer").ThrowAsJavaScriptException();        \
     }                                                                          \
     int var = info[i].As<Napi::Number>().Uint32Value(); 
-    
+
+#define REQUIRE_ARGUMENT_OBJECT(i, var)                                        \
+    if (info.Length() <= (i) || !info[i].IsObject()) {                        \
+        Napi::TypeError::New(info.Env(), "Argument " #i " must be a object").ThrowAsJavaScriptException();        \
+    }                                                                          \
+    Napi::Object var = info[i].As<Napi::Object>();
+
 #define REQUIRE_ARGUMENT_INT(i, var)                                        \
     if (info.Length() <= (i) || !info[i].IsNumber()) {                        \
         Napi::TypeError::New(info.Env(), "Argument " #i " must be a integer").ThrowAsJavaScriptException();        \

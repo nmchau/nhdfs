@@ -27,6 +27,12 @@ fs.list(".").then((list) => {
     let r = await fs.exists('filexxx');
     console.log(`filexxx=${r}`);
 })
+.then ( async () => {
+    let capacity = await fs.getCapacity();
+    console.log(`capacity: ${capacity}`);
+    let used = await fs.getUsed();
+    console.log(`used: ${used}`);
+})
 .catch( (err) => {
     console.log(err);
 });

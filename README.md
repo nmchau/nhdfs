@@ -27,9 +27,9 @@ To build nhdfs the following is required
 command-line by adding --napi-modules.
 
 ``` js
-const FileSystem = require('nhdfs').FileSystem;
+const createFS = require('nhdfs').createFS;
 
-const fs = new FileSystem("namenode", 9000);
+const fs = createFS({service:"namenode", port:9000});
 fs.list(".").then((list) => {
     list.forEach((element) => {
         console.log(element);
@@ -39,4 +39,24 @@ fs.list(".").then((list) => {
     console.log(err);
 })
 ```
+
+#### Ways to connect
+- By defining LIBHDFS3_CONF env variable: path to libhdfs3 config file or to hdfs-site.xml.  
+  or by defining HADOOP_CONF_DIR env variable: Module will check if it has hdfs-site.xml inside.  
+  or by defining HADOOP_CONF_DIR env variable defined: Module will check if it has hdfs-site.xml inside.  
+    ``` js
+    const createFS = require('nhdfs').createFS;
+    const fs = createFS({service:"nameservice"});
+    ```
+- By providing path to config fileHADOOP_CONF_DIR env variable defined. Module will check if it has hdfs-site.xml inside.
+    ``` js
+    const createFS = require('nhdfs').createFS;
+    const fs = createFS({service:"nameservice1", configurationPath:'/opt/hadoop/conf/hdfs-site.xml'});
+    ```
+- By providing NameNode host and port
+    ``` js
+    const createFS = require('nhdfs').createFS;
+    const fs = createFS({service:"namenodehost", port:9000});
+    ```
+
 See [examples](https://github.com/timout/nhdfs/tree/master/examples) for more usage.

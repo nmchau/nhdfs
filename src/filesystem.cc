@@ -16,7 +16,17 @@
 namespace nhdfs
 {
 
-hdfsFS connect(std::string node, tPort port, Napi::Env env)
+void setParam(std::string key, Napi::Object params, std::function<void(std::string)> f)
+{
+    if (params.Has(key))
+    {
+        Napi::Value v = params[key];
+        std::string vs = v.As<Napi::String>();
+        f(vs);
+    }
+}
+
+hdfsFS connect(std::string node, tPort port, Napi::Object params, Napi::Env env)
 {
     //std::cout << "trying to connect " << node << ":" << port << std::endl;
     struct hdfsBuilder *builder = hdfsNewBuilder();
@@ -25,6 +35,9 @@ hdfsFS connect(std::string node, tPort port, Napi::Env env)
     {
         hdfsBuilderSetNameNodePort(builder, port);
     }
+    setParam(USER, params, [builder](std::string user) { hdfsBuilderSetUserName(builder, user.c_str()); } );
+    setParam(TOKEN, params, [builder](std::string token) { hdfsBuilderSetToken(builder, token.c_str()); } );
+    setParam(TICKETPATH, params, [builder](std::string path) { hdfsBuilderSetKerbTicketCachePath(builder, path.c_str()); } );
     hdfsFS fs = hdfsBuilderConnect(builder);
     hdfsFreeBuilder(builder);
     if (!fs)
@@ -52,7 +65,12 @@ void FileSystem::Init(Napi::Env env, Napi::Object exports)
              InstanceMethod("Delete", &FileSystem::Delete),
              InstanceMethod("SetReplication", &FileSystem::SetReplication),
              InstanceMethod("List", &FileSystem::List),
-             InstanceMethod("GetPathInfo", &FileSystem::GetPathInfo)});
+             InstanceMethod("GetPathInfo", &FileSystem::GetPathInfo),
+             InstanceMethod("GetCapacity", &FileSystem::GetCapacity),
+             InstanceMethod("GetUsed", &FileSystem::GetUsed),
+             InstanceMethod("Chown", &FileSystem::Chown),
+             InstanceMethod("Chmod", &FileSystem::Chmod)
+             });            
     constructor = Napi::Persistent(t);
     constructor.SuppressDestruct();
     (exports).Set(Napi::String::New(env, "FileSystem"), t);
@@ -60,25 +78,15 @@ void FileSystem::Init(Napi::Env env, Napi::Object exports)
 
 FileSystem::FileSystem(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileSystem>()
 {
-    if (info.Length() == 0)
-    {
-        this->nameNode = DEFAULT;
-        this->port = 0;
-    }
-    else if (info.Length() == 1)
-    {
-        REQUIRE_ARGUMENT_STRING(0, nn);
-        this->nameNode = nn;
-        this->port = 0;
-    }
-    else
-    {
-        REQUIRE_ARGUMENT_STRING(0, nn);
-        REQUIRE_ARGUMENT_UINT(1, p);
-        this->nameNode = nn;
-        this->port = p;
-    }
-    this->fs = connect(this->nameNode, this->port, info.Env());
+    REQUIRE_ARGUMENTS(3)
+    REQUIRE_ARGUMENT_STRING(0, nn);
+    REQUIRE_ARGUMENT_UINT(1, p);
+    REQUIRE_ARGUMENT_OBJECT(2, params);
+
+    this->nameNode = nn;
+    this->port = p;
+    this->params = params;
+    this->fs = connect(this->nameNode, this->port, this->params, info.Env());
 }
 
 FileSystem::~FileSystem()
@@ -132,8 +140,9 @@ Napi::Value FileSystem::GetWorkingDirectory(const Napi::CallbackInfo &info)
     REQUIRE_ARGUMENT_FUNCTION(2, cb)
     char *b = buffer.Data();
     std::function<int()> f = [this, b, l] {
-        char * res = hdfsGetWorkingDirectory(fs, b, l);
-        if ( ! res ) return -1;
+        char *res = hdfsGetWorkingDirectory(fs, b, l);
+        if (!res)
+            return -1;
         int s = strnlen(res, l);
         return s;
     };
@@ -312,6 +321,80 @@ Napi::Value FileSystem::GetPathInfo(const Napi::CallbackInfo &info)
     Napi::Function cb = info[1].As<Napi::Function>();
     PathInfoWorker *worker = new PathInfoWorker(path, cb, this->fs);
     worker->Queue();
+    return info.Env().Null();
+}
+
+/**
+ * hdfsGetCapacity - Return the raw capacity of the filesystem.
+ * @return Returns the raw-capacity; -1 on error.
+ */
+Napi::Value FileSystem::GetCapacity(const Napi::CallbackInfo &info)
+{
+    REQUIRE_ARGUMENTS(1);
+    Napi::Function cb = info[0].As<Napi::Function>();
+    std::function<res_ptr<tOffset>()> f = [this] (){
+        tOffset r = hdfsGetCapacity(fs);      
+        AsyncResult<tOffset> * ar = new AsyncResult<tOffset>(0, r);
+        return res_ptr<tOffset>(ar);
+    };
+    ValueWorker<tOffset>::Start(f, cb);
+    return info.Env().Null();
+}
+
+/**
+ * hdfsGetUsed - Return the total raw size of all files in the filesystem.
+ * @return Returns the total-size; -1 on error.
+ */
+Napi::Value FileSystem::GetUsed(const Napi::CallbackInfo &info)
+{
+    REQUIRE_ARGUMENTS(1);
+    Napi::Function cb = info[0].As<Napi::Function>();
+    std::function<res_ptr<tOffset>()> f = [this] (){
+        tOffset r = hdfsGetUsed(fs);      
+        AsyncResult<tOffset> * ar = new AsyncResult<tOffset>(0, r);
+        return res_ptr<tOffset>(ar);
+    };
+    ValueWorker<tOffset>::Start(f, cb);
+    return info.Env().Null();
+}
+
+/**
+ * Change the user and/or group of a file or directory.
+ * @param path          the path to the file or directory
+ * @param owner         User string.  Set to NULL for 'no change'
+ * @param group         Group string.  Set to NULL for 'no change'
+ */
+Napi::Value FileSystem::Chown(const Napi::CallbackInfo &info)
+{
+    REQUIRE_ARGUMENTS(4)
+    REQUIRE_ARGUMENT_STRING(0, path)
+    std::string owner = ( info[1].IsUndefined() || info[1].IsNull() ) ? std::string() : info[1].As<Napi::String>();
+    std::string group = ( info[2].IsUndefined() || info[2].IsNull() ) ? std::string() : info[2].As<Napi::String>();
+    REQUIRE_ARGUMENT_FUNCTION(3, cb)
+    std::function<int()> f = [this, path, owner, group] {
+        const char * o = ( owner.empty() ) ? nullptr : owner.c_str(); 
+        const char * g = ( group.empty() ) ? nullptr : group.c_str(); 
+        return hdfsChown(fs, path.c_str(), o, g);
+    };
+    SimpleResWorker::Start(f, cb);
+    return info.Env().Null();
+}
+/**
+ * hdfsChmod
+ * @param fs The configured filesystem handle.
+ * @param path the path to the file or directory
+ * @param mode the bitmask to set it to
+ */
+Napi::Value FileSystem::Chmod(const Napi::CallbackInfo &info)
+{
+    REQUIRE_ARGUMENTS(3)
+    REQUIRE_ARGUMENT_STRING(0, path)
+    REQUIRE_ARGUMENT_INT(1, mode)
+    REQUIRE_ARGUMENT_FUNCTION(2, cb)
+    std::function<int()> f = [this, path, mode] {
+        return hdfsChmod(fs, path.c_str(), mode);
+    };
+    SimpleResWorker::Start(f, cb);
     return info.Env().Null();
 }
 
