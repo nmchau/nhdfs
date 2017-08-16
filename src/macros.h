@@ -41,6 +41,12 @@
     }                                                                          \
     int var = info[i].As<Napi::Number>().Int32Value();     
 
+#define REQUIRE_ARGUMENT_LONG(i, var)                                        \
+    if (info.Length() <= (i) || !info[i].IsNumber()) {                        \
+        Napi::TypeError::New(info.Env(), "Argument " #i " must be a integer").ThrowAsJavaScriptException();        \
+    }                                                                          \
+    int64_t var = info[i].As<Napi::Number>().Int64Value(); 
+
 #define REQUIRE_ARGUMENT_BUFFER(i, var)                                        \
     if (info.Length() <= (i) || !info[i].IsBuffer()) {                        \
         Napi::TypeError::New(info.Env(), "Argument " #i " must be a byte buffer").ThrowAsJavaScriptException();        \

@@ -73,12 +73,20 @@ public:
 
   /**
  * hdfsChmod
- * @param fs The configured filesystem handle.
  * @param path the path to the file or directory
  * @param mode the bitmask to set it to
  * @return 0 on success else -1
  */
   Napi::Value Chmod(const Napi::CallbackInfo &info);
+
+  /**
+ * hdfsUtime
+ * @param path the path to the file or directory
+ * @param mtime new modification time or -1 for no change
+ * @param atime new access time or -1 for no change
+ * @return 0 on success else -1
+ */
+ Napi::Value Utime(const Napi::CallbackInfo &info);
 
   FileSystem(const Napi::CallbackInfo &info);
   ~FileSystem();

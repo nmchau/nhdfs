@@ -69,7 +69,8 @@ void FileSystem::Init(Napi::Env env, Napi::Object exports)
              InstanceMethod("GetCapacity", &FileSystem::GetCapacity),
              InstanceMethod("GetUsed", &FileSystem::GetUsed),
              InstanceMethod("Chown", &FileSystem::Chown),
-             InstanceMethod("Chmod", &FileSystem::Chmod)
+             InstanceMethod("Chmod", &FileSystem::Chmod),
+             InstanceMethod("Utime", &FileSystem::Utime)
              });            
     constructor = Napi::Persistent(t);
     constructor.SuppressDestruct();
@@ -397,5 +398,25 @@ Napi::Value FileSystem::Chmod(const Napi::CallbackInfo &info)
     SimpleResWorker::Start(f, cb);
     return info.Env().Null();
 }
+
+/**
+ * hdfsUtime
+ * @param path the path to the file or directory
+ * @param mtime new modification time or -1 for no change
+ * @param atime new access time or -1 for no change
+ */
+ Napi::Value FileSystem::Utime(const Napi::CallbackInfo &info)
+ {
+    REQUIRE_ARGUMENTS(3)
+    REQUIRE_ARGUMENT_STRING(0, path)
+    REQUIRE_ARGUMENT_LONG(1, mtime)
+    REQUIRE_ARGUMENT_LONG(2, atime)
+    REQUIRE_ARGUMENT_FUNCTION(3, cb)
+    std::function<int()> f = [this, path, mtime, atime] {
+        return hdfsUtime(fs, path.c_str(), mtime, atime);
+    };
+    SimpleResWorker::Start(f, cb);
+    return info.Env().Null();
+ }
 
 } // namespace nhdfs
