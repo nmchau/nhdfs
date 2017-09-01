@@ -1,8 +1,12 @@
 'use strict';
 
-const FileSystem = require('nhdfs').FileSystem;
+const createFS = require('nhdfs').createFS;
+const fs = createFS({service:"namenode", port:9000});
+//const fs = createFS({service:"nameservice1"});
+//const fs = createFS({service:"nameservice1", configurationPath:'/opt//hadoop/conf/hdfs-site.xml'});
+//const fs = createFS({service:"nameservice1", user:"testuser", configurationPath:'/opt/hadoop/conf/hdfs-site.xml'});
+//const fs = createFS();
 
-const fs = new FileSystem("namenode", 9000);
 fs.list(".").then((list) => {
     list.forEach((element) => {
         console.log(element);

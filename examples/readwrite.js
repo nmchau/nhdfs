@@ -1,8 +1,11 @@
 'use strict';
 
-const FileSystem = require('nhdfs').FileSystem;
-
-const fs = new FileSystem("namenode", 9000);
+const createFS = require('nhdfs').createFS;
+const fs = createFS({service:"namenode", port:9000});
+//const fs = createFS({service:"nameservice1"});
+//const fs = createFS({service:"nameservice1", configurationPath:'/opt//hadoop/conf/hdfs-site.xml'});
+//const fs = createFS({service:"nameservice1", user:"testuser", configurationPath:'/opt/hadoop/conf/hdfs-site.xml'});
+//const fs = createFS();
 
 const name = "writertest";
 
