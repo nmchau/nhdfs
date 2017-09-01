@@ -29,7 +29,7 @@ void FileWriter::Init(Napi::Env env, Napi::Object exports)
     (exports).Set(Napi::String::New(env, "FileWriter"), t);
 }
 
-FileWriter::FileWriter(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileWriter>()
+FileWriter::FileWriter(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileWriter>(info)
 {
     REQUIRE_ARGUMENTS(2);
     REQUIRE_ARGUMENT_STRING(0, path)

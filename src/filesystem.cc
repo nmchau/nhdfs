@@ -77,7 +77,7 @@ void FileSystem::Init(Napi::Env env, Napi::Object exports)
     (exports).Set(Napi::String::New(env, "FileSystem"), t);
 }
 
-FileSystem::FileSystem(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileSystem>()
+FileSystem::FileSystem(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileSystem>(info)
 {
     REQUIRE_ARGUMENTS(3)
     REQUIRE_ARGUMENT_STRING(0, nn);

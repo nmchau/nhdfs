@@ -29,7 +29,7 @@ void FileReader::Init(Napi::Env env, Napi::Object exports)
     (exports).Set(Napi::String::New(env, "FileReader"), t);
 }
 
-FileReader::FileReader(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileReader>() 
+FileReader::FileReader(const Napi::CallbackInfo &info) : Napi::ObjectWrap<FileReader>(info) 
 {
     REQUIRE_ARGUMENTS(2)
     REQUIRE_ARGUMENT_STRING(0, path)
