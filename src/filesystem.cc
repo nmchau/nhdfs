@@ -70,7 +70,8 @@ void FileSystem::Init(Napi::Env env, Napi::Object exports)
              InstanceMethod("GetUsed", &FileSystem::GetUsed),
              InstanceMethod("Chown", &FileSystem::Chown),
              InstanceMethod("Chmod", &FileSystem::Chmod),
-             InstanceMethod("Utime", &FileSystem::Utime)
+             InstanceMethod("Utime", &FileSystem::Utime),
+             InstanceMethod("Truncate", &FileSystem::Truncate)
              });            
     constructor = Napi::Persistent(t);
     constructor.SuppressDestruct();
@@ -407,7 +408,7 @@ Napi::Value FileSystem::Chmod(const Napi::CallbackInfo &info)
  */
  Napi::Value FileSystem::Utime(const Napi::CallbackInfo &info)
  {
-    REQUIRE_ARGUMENTS(3)
+    REQUIRE_ARGUMENTS(4)
     REQUIRE_ARGUMENT_STRING(0, path)
     REQUIRE_ARGUMENT_LONG(1, mtime)
     REQUIRE_ARGUMENT_LONG(2, atime)
@@ -416,6 +417,30 @@ Napi::Value FileSystem::Chmod(const Napi::CallbackInfo &info)
         return hdfsUtime(fs, path.c_str(), mtime, atime);
     };
     SimpleResWorker::Start(f, cb);
+    return info.Env().Null();
+ }
+
+/**
+ * hdfsTruncate - Truncate the file in the indicated path to the indicated size.
+ * @param fs The configured filesystem handle.
+ * @param path the path to the file.
+ * @param pos the position the file will be truncated to.
+ * @return true if and client does not need to wait for block recovery,
+ * false if client needs to wait for block recovery.
+ */
+ Napi::Value FileSystem::Truncate(const Napi::CallbackInfo &info) 
+ {
+    REQUIRE_ARGUMENTS(3)
+    REQUIRE_ARGUMENT_STRING(0, path)
+    REQUIRE_ARGUMENT_LONG(1, pos)
+    REQUIRE_ARGUMENT_FUNCTION(2, cb)
+    std::function<res_ptr<bool>()> f = [this, path, pos] {
+        int shouldWait = 0;
+        int res = hdfsTruncate(fs, path.c_str(), pos, &shouldWait); //TODO: node gets null
+        AsyncResult<bool> * ar = new AsyncResult<bool>(res, shouldWait);
+        return res_ptr<bool>(ar);
+    };
+    ValueWorker<bool>::Start(f, cb);
     return info.Env().Null();
  }
 

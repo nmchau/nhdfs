@@ -13,7 +13,7 @@
     "preinstall": "./hdfslib-build.sh",
     "install": "node-gyp rebuild",
     "gyp-build": "node-gyp rebuild",
-    "clean": "rm -rf build_deps"    
+    "clean": "rm -rf build_deps"
   },
   "author": "timout",
   "license": "MIT",

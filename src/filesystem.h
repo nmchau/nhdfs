@@ -88,6 +88,17 @@ public:
  */
  Napi::Value Utime(const Napi::CallbackInfo &info);
 
+ /**
+ * Truncate - Truncate the file in the indicated path to the indicated size.
+ * @param fs The configured filesystem handle.
+ * @param path the path to the file.
+ * @param pos the position the file will be truncated to.
+ * @return true if and client does not need to wait for block recovery,
+ * false if client needs to wait for block recovery.
+ */
+ Napi::Value Truncate(const Napi::CallbackInfo &info);
+
+
   FileSystem(const Napi::CallbackInfo &info);
   ~FileSystem();
 

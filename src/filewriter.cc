@@ -51,10 +51,11 @@ FileWriter::~FileWriter()
 
 Napi::Value FileWriter::Open(const Napi::CallbackInfo &info) 
 {
-    REQUIRE_ARGUMENTS(1)
-    REQUIRE_ARGUMENT_FUNCTION(0, cb)
-    std::function<int()> f = [this] {
-        file = hdfsOpenFile(fs, path.c_str(), O_WRONLY, 0 /*not used*/, 0, 0);
+    REQUIRE_ARGUMENTS(2)
+    REQUIRE_ARGUMENT_INT(0, replication)
+    REQUIRE_ARGUMENT_FUNCTION(1, cb)
+    std::function<int()> f = [replication, this] {
+        file = hdfsOpenFile(fs, path.c_str(), O_WRONLY, 0 /*not used*/, replication, 0);
         return (file) ? 0 : -1;
     };
     SimpleResWorker::Start(f, cb);
