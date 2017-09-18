@@ -6,7 +6,8 @@
         "src/nhdfs.cc", 
         "src/filereader.cc", 
         "src/filewriter.cc", 
-        "src/filesystem.cc" 
+        "src/filesystem.cc",
+        "src/clusterinfo.cc"  
       ],
       "dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
       "cflags!": [ "-fno-exceptions" ],

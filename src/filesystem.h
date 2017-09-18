@@ -53,6 +53,12 @@ public:
   Napi::Value GetPathInfo(const Napi::CallbackInfo &info);
 
   /**
+  * GetDefaultBlockSize - Get the default blocksize.
+  * @return The default blocksize or error.
+  */
+  Napi::Value GetDefaultBlockSize(const Napi::CallbackInfo &info);
+
+  /**
   * hdfsGetCapacity - Return the raw capacity of the filesystem.
   */
   Napi::Value GetCapacity(const Napi::CallbackInfo &info);

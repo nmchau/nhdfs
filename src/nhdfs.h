@@ -5,5 +5,6 @@
 #include "filesystem.h"
 #include "filereader.h"
 #include "filewriter.h"
+#include "clusterinfo.h"
 
 #endif //NHDFS_NHDFS_H_

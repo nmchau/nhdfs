@@ -1,7 +1,8 @@
 'use strict';
 
 const createFS = require('nhdfs').createFS;
-const fs = createFS({service:"namenode", port:9000});
+//const fs = createFS({service:"namenode", port:9000});
+const fs = createFS({service:"localhost", port:9000});
 //const fs = createFS({service:"nameservice1"});
 //const fs = createFS({service:"nameservice1", configurationPath:'/opt//hadoop/conf/hdfs-site.xml'});
 //const fs = createFS({service:"nameservice1", user:"testuser", configurationPath:'/opt/hadoop/conf/hdfs-site.xml'});
@@ -16,10 +17,12 @@ fs.list(".").then((list) => {
     console.log(err);
 })
 .then ( async () => {
+    await fs.mkdir('dir1');
     let r = await fs.isDirectory('dir1');
     console.log(`dir1=${r}`);
 })
 .then ( async () => {
+    await fs.mkdir('file1');
     let r = await fs.isFile('file1');
     console.log(`file1=${r}`);
 })
@@ -32,6 +35,8 @@ fs.list(".").then((list) => {
     console.log(`filexxx=${r}`);
 })
 .then ( async () => {
+    let dbs = await fs.getDefaultBlockSize();
+    console.log(`Default Block Size: ${dbs}`);
     let capacity = await fs.getCapacity();
     console.log(`capacity: ${capacity}`);
     let used = await fs.getUsed();

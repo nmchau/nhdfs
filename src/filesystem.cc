@@ -66,6 +66,7 @@ void FileSystem::Init(Napi::Env env, Napi::Object exports)
              InstanceMethod("SetReplication", &FileSystem::SetReplication),
              InstanceMethod("List", &FileSystem::List),
              InstanceMethod("GetPathInfo", &FileSystem::GetPathInfo),
+             InstanceMethod("GetDefaultBlockSize", &FileSystem::GetDefaultBlockSize),
              InstanceMethod("GetCapacity", &FileSystem::GetCapacity),
              InstanceMethod("GetUsed", &FileSystem::GetUsed),
              InstanceMethod("Chown", &FileSystem::Chown),
@@ -325,6 +326,23 @@ Napi::Value FileSystem::GetPathInfo(const Napi::CallbackInfo &info)
     worker->Queue();
     return info.Env().Null();
 }
+
+/**
+ * hdfsGetDefaultBlockSize - Get the default blocksize.
+ * @return the default blocksize, or -1 on error.
+ */
+ Napi::Value FileSystem::GetDefaultBlockSize(const Napi::CallbackInfo &info)
+ {
+    REQUIRE_ARGUMENTS(1);
+    Napi::Function cb = info[0].As<Napi::Function>();
+    std::function<res_ptr<tOffset>()> f = [this] (){
+        tOffset r = hdfsGetDefaultBlockSize(fs);      
+        AsyncResult<tOffset> * ar = new AsyncResult<tOffset>(0, r);
+        return res_ptr<tOffset>(ar);
+    };
+    ValueWorker<tOffset>::Start(f, cb);
+    return info.Env().Null();
+ }
 
 /**
  * hdfsGetCapacity - Return the raw capacity of the filesystem.

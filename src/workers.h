@@ -24,6 +24,25 @@ struct AsyncError
     AsyncError(int e, std::string m) : err(e), message(m) {}
 };
 
+inline std::shared_ptr<AsyncError> createAsyncError(int e, std::string m)
+{
+    AsyncError *err = new AsyncError(errno, hdfsGetLastError());
+    return std::shared_ptr<AsyncError>(err);
+}
+
+inline Napi::Value converError(std::shared_ptr<AsyncError> error, Napi::AsyncWorker * worker) 
+{
+    Napi::Env env = worker->Env();
+    if ( error ) {
+        Napi::Object e = Napi::Object::New(env);
+        e.Set(NAPISTRING(env, "message"), NAPISTRING(env, error->message));
+        e.Set(NAPISTRING(env, "errno"), NAPIINT(env, error->err));
+        return e;
+    } else {
+        return env.Null();
+    }
+}
+
 /**
 * Worker to call simple async op and return result as callback
 */
@@ -132,8 +151,7 @@ class ValueWorker : public Napi::AsyncWorker
         this->result = func();
         if (this->result->result < 0)
         {
-            AsyncError * err = new AsyncError(errno, hdfsGetLastError());
-            this->error = std::shared_ptr<AsyncError>(err);
+            this->error = createAsyncError(errno, hdfsGetLastError());
         }
     }
     void OnOK() override
@@ -146,15 +164,7 @@ class ValueWorker : public Napi::AsyncWorker
   private:
     Napi::Value getErr()
     {
-        Napi::Env env = this->Env();
-        if ( this->error ) {
-            Napi::Object e = Napi::Object::New(env);
-            e.Set(NAPISTRING(env, "message"), NAPISTRING(env, this->error->message));
-            e.Set(NAPISTRING(env, "errno"), NAPIINT(env, this->error->err));
-            return e;
-        } else {
-            return env.Null();
-        }
+        return converError(this->error, this);
     }
 
   private:
