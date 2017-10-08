@@ -1,7 +1,7 @@
 {
   "name": "nhdfs",
-  "version": "0.0.2",
-  "description": "ode.js Native HDFS library wrapper",
+  "version": "0.0.3",
+  "description": "Node.js Native HDFS library wrapper",
   "homepage": "https://github.com/timout/nhdfs",
   "repository": {
     "type": "git",
@@ -23,7 +23,7 @@
   ],
   "dependencies": {
     "bindings": "^1.2.1",
-    "node-addon-api": "^0.6.3"
+    "node-addon-api": "^1.0.0"
   },
   "devDependencies": {
     "node-gyp": "^3.6.2"

@@ -24,7 +24,7 @@ To build nhdfs the following is required
 ### Usage
 
 **Note:** the module must be installed before use and N-API must be enabled on the 
-command-line by adding --napi-modules.
+command-line by adding --napi-modules (no need that option starting Node.js 8.6.0).
 
 ``` js
 const createFS = require('nhdfs').createFS;

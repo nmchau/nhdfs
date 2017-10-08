@@ -2,7 +2,6 @@
 
 const timeout = require("./utils").timeout
 
-//const createFS = require('nhdfs').createFS;
 const createFS = require('nhdfs').createFS;
 const fs = createFS({service:"localhost", port:9000});
 //const fs = createFS({service:"nameservice1"});
@@ -12,6 +11,7 @@ const fs = createFS({service:"localhost", port:9000});
 const name = "/writertest";
 
 function write() {
+    console.log(`Write to ${name}`);
     const out = fs.createWriteStream(name, {replication:1});
     out.on('error', (err) => {
         console.log(err);
@@ -23,6 +23,7 @@ function write() {
     out.end(`{name: 'last line 1001', msg: 'later on world number 1001', num: 1001}`);
     return new Promise((resolve, reject) => {
         out.on('finish', () => {
+            console.log(`Done with write to ${name}, sleeping`);
             setTimeout(resolve, 1000);
         })
     });
@@ -42,7 +43,7 @@ async function truncate() {
 }
 
 write().then( () => {
-    truncate();
+    return truncate();
 }).catch( (err) => {
     console.log(err);
 });

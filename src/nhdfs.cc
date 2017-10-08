@@ -5,7 +5,7 @@ using namespace nhdfs;
 namespace
 {
 
-void RegisterModule(Napi::Env env, Napi::Object exports, Napi::Object module)
+Napi::Object RegisterModule(Napi::Env env, Napi::Object exports)
 {
   Napi::HandleScope scope(env);
 
@@ -13,6 +13,7 @@ void RegisterModule(Napi::Env env, Napi::Object exports, Napi::Object module)
   FileSystem::Init(env, exports);
   FileReader::Init(env, exports);
   FileWriter::Init(env, exports);
+  return exports;
 }
 
 }
