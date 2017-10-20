@@ -44,3 +44,5 @@ node_modules/
 package-lock.json
 
 deps/incubator-hawq 
+deps/update_lib.sh
+deps/CMakeList.txt
