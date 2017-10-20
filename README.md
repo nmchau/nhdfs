@@ -5,7 +5,7 @@ nhdfs
 
 #### Native hdfs library: 
 
- - [Pivotal libhdfs3](https://github.com/Pivotal-Data-Attic/pivotalrd-libhdfs3)
+ - [Pivotal libhdfs3](https://github.com/apache/incubator-hawq/tree/master/depends/libhdfs3)
  
 
 ### Requirement
@@ -20,11 +20,15 @@ To build nhdfs the following is required
     kerberos                        http://web.mit.edu/kerberos/
     libuuid                         http://sourceforge.net/projects/libuuid/
     libgsasl                        http://www.gnu.org/software/gsasl/
+    openssl                         https://www.openssl.org/
 
 ### Usage
 
-**Note:** the module must be installed before use and N-API must be enabled on the 
+**Note:** 
+1) the module must be installed before use and N-API must be enabled on the 
 command-line by adding --napi-modules (no need that option starting Node.js 8.6.0).
+2) For Mac users, openssl must be installed with brew
+
 
 ``` js
 const createFS = require('nhdfs').createFS;
