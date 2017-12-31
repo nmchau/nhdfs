@@ -12,7 +12,7 @@ nhdfs
 
 To build nhdfs the following is required
 
-    Node.js(8.0+) the library uses ABI-stable N-API for building the native Addon.
+    Node.js(8.6+) the library uses ABI-stable N-API for building the native Addon.
     cmake (2.8+)                    http://www.cmake.org/
     boost (tested on 1.53+)         http://www.boost.org/
     google protobuf                 http://code.google.com/p/protobuf/
