@@ -1,0 +1,18 @@
+FROM iamtimout/hadoop-test:0.1.2
+WORKDIR /nhdfs
+
+COPY deps /nhdfs/deps 
+COPY lib /nhdfs/lib
+COPY src /nhdfs/src
+COPY binding.gyp /nhdfs/
+COPY hdfslib-build.sh /nhdfs/
+COPY nhdfs.js /nhdfs/
+COPY package.json /nhdfs/
+
+RUN npm install --unsafe-perm
+
+COPY test /nhdfs/test
+COPY docker/run-test.sh /nhdfs/run-test.sh
+RUN chmod 755 /nhdfs/run-test.sh
+
+ENTRYPOINT ["/nhdfs/run-test.sh"]
