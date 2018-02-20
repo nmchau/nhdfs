@@ -34,6 +34,10 @@ build/
 build/Release
 build_deps/
 
+#deps tests
+deps/libhdfs3/test
+deps/libhdfs3/mock
+
 # Dependency directories
 node_modules/
 jspm_packages/
@@ -63,5 +67,3 @@ typings/
 .vscode
 
 package-lock.json
-
-test*
