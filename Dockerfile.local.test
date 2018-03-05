@@ -1,0 +1,9 @@
+FROM nhdfs-base
+#FROM iamtimout/hadoop-test:0.1.2
+WORKDIR /nhdfs
+
+COPY test /nhdfs/test
+COPY docker/run-test.sh /nhdfs/run-test.sh
+RUN chmod 755 /nhdfs/run-test.sh
+
+ENTRYPOINT ["/nhdfs/run-test.sh"]

@@ -1,0 +1,13 @@
+FROM iamtimout/hadoop-test:0.1.2
+WORKDIR /nhdfs
+
+COPY deps /nhdfs/deps 
+COPY lib /nhdfs/lib
+COPY src /nhdfs/src
+COPY binding.gyp /nhdfs/
+COPY hdfslib-build.sh /nhdfs/
+COPY nhdfs.js /nhdfs/
+COPY package.json /nhdfs/
+
+RUN npm install --unsafe-perm
+
